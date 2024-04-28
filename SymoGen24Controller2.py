@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 import SymoGen24Connector
-import mqtt_lesen
+import mqtt_functions
 from ping3 import ping
 from sys import argv
 from functions import loadConfig, loadWeatherData, loadPVReservierung, getVarConf, save_SQLite
@@ -214,7 +214,7 @@ if __name__ == '__main__':
         if  mqtt_status == 1:
             try:        
                 print("\n######### MQTT empfangen und in JSON schreiben #########\n") 
-                mqtt_lesen.lesen()
+                mqtt_functions.lesen()
             except Exception as e:
                 print()
                 print("Fehler in den Printbefehlen, Ausgabe nicht möglich!")
