@@ -497,7 +497,7 @@ if __name__ == '__main__':
                         try:
                             #print("************* BEGINN: ", datetime.now(),"************* ")
                             print("\n######### L A D E S T E U E R U N G #########\n")
-                            print("MQTT Status                 ", mqtt_status)
+                            print("MQTT Status:                ", mqtt_status)
                             print("aktuellePrognose:           ", aktuelleVorhersage)
                             print("RestTagesPrognose:          ", TagesPrognoseGesamt)
                             print("PrognoseAbzugswert/Stunde:  ", PrognoseAbzugswert)
