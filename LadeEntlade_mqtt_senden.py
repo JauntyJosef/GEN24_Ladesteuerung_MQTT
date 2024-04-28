@@ -2,39 +2,34 @@ import sys
 import mqtt_functions
 import configparser
 
+
 config = configparser.ConfigParser()
 config.read('/home/GEN24/config.ini')
 maintopic = config.get('MQTT', 'maintopic')
 
-# Überprüfe, ob die Anzahl der übergebenen Argumente korrekt ist
 if len(sys.argv) != 2:
     print("Bitte geben Sie genau ein Argument an.")
     sys.exit(1)
 
-# Die Variable aus dem ersten Argument lesen (das Skript selbst ist argv[0])
 Wert = sys.argv[1]
 
-# Überprüfe den Wert der Variable und führe entsprechende Aktionen aus
-if Wert == "0":
-    value = "Auto"
-    mqtt_functions.publish_message(maintopic + "/Laderate", value)
-    # Hier kannst du Code für Fall 1 einfügen
-elif Wert == "0.000001":
-    value = "Aus"
-    mqtt_functions.publish_message(maintopic + "/Laderate", value)
-elif Wert == "0.0005":
-    value = "Halb"
-    mqtt_functions.publish_message(maintopic + "/Laderate", value)
-elif Wert == "0.001":
-    value = "Voll"
-    mqtt_functions.publish_message(maintopic + "/Laderate", value)
-elif Wert == "AUS":
+if Wert == "AUS":
+    topic = maintopic + "/Entladerate"
     value = "0"
-    mqtt_functions.publish_message(maintopic + "/Entladerate", value)
+elif Wert == "0":
+    topic = maintopic + "/Laderate"
+    value = "Auto"
+elif Wert == "0.000001":
+    topic = maintopic + "/Laderate"
+    value = "Aus"
+elif Wert == "0.0005":
+    topic = maintopic + "/Laderate"
+    value = "Halb"
+elif Wert == "0.001":
+    topic = maintopic + "/Laderate"
+    value = "Voll"
 else:
+    topic = maintopic + "/Entladerate"
     value = Wert
-    mqtt_functions.publish_message(maintopic + "/Entladerate", value)
 
-
-
-
+mqtt_functions.publish_message(topic, value)
