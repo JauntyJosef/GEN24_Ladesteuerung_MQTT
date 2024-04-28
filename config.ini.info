@@ -6,6 +6,22 @@
 ; Parameter für die Batterieladesteuerung
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; QTT
+; Beim Speichern in der Weboberfläche auf der Seite "LadeStrg" bzw "ENTLadeStrg":
+; Die Batterieladerate "Auto", "Aus", "Halb" oder "Voll" wird an das Topic "maintopic/Ladesteuerung" per MQTT gesendet.
+; Die "Feste Entladerate" wird an das Topic "maintoptic/Entladerate" gesendet.
+; Beim Ausführen von "SymoGen24Controller.py" werden die oa Topics abgerufen und die Werte in dei EV_Reservierung.json
+; bzw Akku_EntLadeSteuerFile.json geschrieben.
+; Wichtig ist, dass sich alles im Ordner /home/GEN24 befindet.
+[MQTT]
+; 0 = MQTT senden/empfangen aus, 1 = MQTT senden/empfangen ein
+mqtt = 1
+broker_address = 10.0.0.160
+broker_port = 1883
+; Das Haupttopic ohne / am Ende einegeben.
+maintopic = Batteriesteuerung
+
+
 ; Name der Datei mit den Wetterprognosewerten
 [env]
 filePathWeatherData=weatherData.json

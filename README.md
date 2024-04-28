@@ -1,5 +1,9 @@
 
-## ☀️ GEN24_Ladesteuerung 🔋 
+## ☀️ GEN24_Ladesteuerung mit MQTT🔋
+Im Unterschied zum Original, gibt es eine rudimentäre Implimentierung einer MQTT Funktion. Eine Erklärung ist in der config.ini.info zu lesen.
+Das Ganze ist noch wenig getestet.
+Das paho-mqtt Paket muss installiert werden (siehe unten).
+
 (getestet unter Python 3.8 und 3.9)  
 - Prognosebasierte Ladesteuerung für  Fronius Symo GEN24 Plus um eine Einspeisebegrenzung (bei mir 70%) zu umgehen,
 und eine Produktion über der AC-Ausgangsleistungsgrenze des WR als DC in die Batterie zu laden.  
@@ -28,6 +32,7 @@ sudo pip install xmltodict
 sudo pip install NumPy==v1.23.1
 sudo pip install requests
 sudo pip install ping3
+sudo pip install paho-mqtt==1.51
 ```
 Mit start_PythonScript.sh können Pythonskripte per Cronjobs oder auf der Shell gestartet werden, die Ausgabe erfolgt dann in die Datei "Crontab.log".  
 Als Erstes muss ein Prognoseskript aufgerufen werden, damit neue Prognosedaten in der Datei weatherData.json vorhanden sind!  

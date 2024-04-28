@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 import SymoGen24Connector
+import mqtt_lesen
 from ping3 import ping
 from sys import argv
 from functions import loadConfig, loadWeatherData, loadPVReservierung, getVarConf, save_SQLite
@@ -196,8 +197,30 @@ if __name__ == '__main__':
         now = datetime.now()
         format = "%Y-%m-%d %H:%M:%S"
 
+        mqtt_status = getVarConf('MQTT', "mqtt", 'eval')
         host_ip = getVarConf('gen24','hostNameOrIp', 'str')
         host_port = getVarConf('gen24','port', 'str')
+        print_level = getVarConf('Ladeberechnung','print_level','eval')
+
+        try:
+            print("\n")          
+            print("************* BEGINN: ", datetime.now(),"************* ") 
+        except Exception as e:
+            print()
+            print("Fehler in den Printbefehlen, Ausgabe nicht möglich!")
+            print("Fehlermeldung:", e)
+            print()
+
+        if  mqtt_status == 1:
+            try:        
+                print("\n######### MQTT empfangen und in JSON schreiben #########\n") 
+                mqtt_lesen.lesen()
+            except Exception as e:
+                print()
+                print("Fehler in den Printbefehlen, Ausgabe nicht möglich!")
+                print("Fehlermeldung:", e)
+                print()
+
         if ping(host_ip):
             # Nur ausführen, wenn WR erreichbar
             gen24 = None
@@ -205,7 +228,6 @@ if __name__ == '__main__':
             try:            
                     newPercent = None
                     DEBUG_Ausgabe= "\nDEBUG <<<<<< E I N >>>>>>>\n"
-    
                     ###############################
     
                     weatherfile = getVarConf('env','filePathWeatherData','str')
@@ -473,8 +495,9 @@ if __name__ == '__main__':
 
                     if print_level >= 1:
                         try:
-                            print("************* BEGINN: ", datetime.now(),"************* ")
+                            #print("************* BEGINN: ", datetime.now(),"************* ")
                             print("\n######### L A D E S T E U E R U N G #########\n")
+                            print("MQTT Status                 ", mqtt_status)
                             print("aktuellePrognose:           ", aktuelleVorhersage)
                             print("RestTagesPrognose:          ", TagesPrognoseGesamt)
                             print("PrognoseAbzugswert/Stunde:  ", PrognoseAbzugswert)

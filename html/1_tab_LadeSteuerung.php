@@ -184,7 +184,7 @@ $ManuelleSteuerung_check = array(
     "auto" => "",
     "aus" => "",
     "halb" => "",
-    "voll" => "",
+    "voll" => ""
 );
 
 if (isset($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'])) {
@@ -201,7 +201,7 @@ $ManuelleSteuerung_check['auto'] = 'checked';
 <div class="wrapper">
 <div class="beschriftung" title='Ladung des Hausakkus mit einem Anteil der konfigurierten "MaxLadung" 
                   (Auto= nach Prognose, AUS=0%, HALB=50%, VOLL=100%)'>
-<nobr>Ladegrenze</nobr>
+<nobr>Batterieladerate</nobr>
 </div>
  <input type="radio" name="hausakkuladung" id="auto" value="0" <?php echo $ManuelleSteuerung_check['auto'] ?>>
  <input type="radio" name="hausakkuladung" id="aus" value="0.000001" <?php echo $ManuelleSteuerung_check['aus'] ?> >
