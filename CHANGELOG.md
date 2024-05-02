@@ -1,13 +1,25 @@
-**[0.13.3] – 2024-XX-XX**
+**[0.14.0] – 2024-XX-XX**
+
+**NEU Konzeptionierung der Ladewertberechnung nach Prognose:**
+Umfangreiche Änderung in SymoGen24Controller2.py
+- genauere Berechnung der Ladedewerte aus den Prognosen.
+  Vermeidung von Sprüngen in der Prognosenberechnung
+
+Ladewerte_Vergleichtabelle.ods entfernt, da nicht mehr aktuell und nötig
+
+
+**[0.13.3] – 2024-04-30**
 
 Änderung in SymoGen24Controller2.py
 - Bei Akkuschonung Schaltverzögerung (hysterese) eingebaut
 - Bei zu geringer Prognose Akkuschonung nicht ausführen:  
   ``aktuelleVorhersage - (Grundlast /2) > AkkuschonungLadewert``
+- Fix: Einspeisegrenzprüfung teilweise falsch.
 
 **Berechnung der Ladewerte durch die Prognose neu konzipiert:**  
-  **!!ACHTUNG noch starker Entwicklungsstand!!!**
+  **!!ACHTUNG noch Entwicklungsstand!!!**
 - aktuell nur zum testen in der Datei neu_SymoGen24Controller2.py.  
+  neu_SymoGen24Controller2.py ersetzt ab Version 0.14.0 die aktuelle SymoGen24Controller2.py
   Der Quellcode soll dadurch einfacher und übersichtlicher werden.
 
 **[0.13.2] – 2024-04-07**
