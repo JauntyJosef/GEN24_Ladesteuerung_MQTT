@@ -146,9 +146,12 @@ def getAktuellenLadewert( AbzugWatt, aktuelleEinspeisung, aktuellePVProduktion )
 
         # Hinweis: aktuelleBatteriePower ist beim Laden der Batterie minus
         # Wenn Einspeisung über Einspeisegrenze, dann könnte WR schon abregeln, desshalb WRSchreibGrenze_nachOben addieren
-        # aktuelleEinspeisung - aktuelleBatteriePower - alterLadewert > Einspeisegrenze #aktuelle Ladung kann zufällig kleiner als die Ladegrenze sein.
-        if aktuelleEinspeisung - aktuelleBatteriePower - alterLadewert > Einspeisegrenze:
-            EinspeisegrenzUeberschuss = int(aktuelleEinspeisung + alterLadewert - Einspeisegrenze + (WRSchreibGrenze_nachOben + 5))
+        # Durch Trägheit des WR wird vereinzelt die Einspeisung durch gleichzeitigen Netzbezug größer als die Produktion, dann nicht anwenden
+        if (aktuelleEinspeisung - aktuelleBatteriePower > Einspeisegrenze) and aktuelleEinspeisung < aktuellePVProduktion:
+            if (aktuelleEinspeisung - aktuelleBatteriePower - alterLadewert > Einspeisegrenze):
+                EinspeisegrenzUeberschuss = int(aktuelleEinspeisung + alterLadewert - Einspeisegrenze + (WRSchreibGrenze_nachOben + 5))
+            else:
+                EinspeisegrenzUeberschuss = int(aktuelleEinspeisung + alterLadewert - Einspeisegrenze)
 
             # Damit durch die Pufferaddition nicht die maximale PV_Leistung überschritten wird
             if EinspeisegrenzUeberschuss > PV_Leistung_Watt - Einspeisegrenze:
@@ -170,11 +173,13 @@ def getAktuellenLadewert( AbzugWatt, aktuelleEinspeisung, aktuellePVProduktion )
         # Wenn  PV-Produktion > WR_Kapazitaet (AC)
         if aktuellePVProduktion > WR_Kapazitaet:
             kapazitaetsueberschuss = int(aktuellePVProduktion - WR_Kapazitaet )
-            if (kapazitaetsueberschuss > alterLadewert + 100 and kapazitaetsueberschuss < alterLadewert + WRSchreibGrenze_nachOben):
-                kapazitaetsueberschuss = alterLadewert + WRSchreibGrenze_nachOben + 10
-            if kapazitaetsueberschuss > PV_Leistung_Watt - WR_Kapazitaet:
-                kapazitaetsueberschuss = PV_Leistung_Watt - WR_Kapazitaet
-            if (kapazitaetsueberschuss > aktuellerLadewert):
+            # WIGG if (kapazitaetsueberschuss > alterLadewert * 1.1):
+            if (kapazitaetsueberschuss > alterLadewert):
+                if (kapazitaetsueberschuss < alterLadewert + WRSchreibGrenze_nachOben):
+                    kapazitaetsueberschuss = alterLadewert + WRSchreibGrenze_nachOben + 10
+                    # Damit der kapazitaetsueberschuss durch die Addition der WRSchreibGrenze_nachOben nicht grösser als die PV_Leistung_Watt wird.
+                    if kapazitaetsueberschuss > PV_Leistung_Watt - WR_Kapazitaet:
+                        kapazitaetsueberschuss = PV_Leistung_Watt - WR_Kapazitaet
                 aktuellerLadewert = kapazitaetsueberschuss
                 LadewertGrund = "PV-Produktion > AC_Kapazitaet WR"
 
@@ -355,8 +360,7 @@ if __name__ == '__main__':
                         WRSchreibGrenze_nachOben = int(WRSchreibGrenze_nachOben * (1 + ( BattStatusProz - 90 ) / 5))
                         DEBUG_Ausgabe += "DEBUG ## Batt >90% ## WRSchreibGrenze_nachOben: " + str(WRSchreibGrenze_nachOben) +"\n"
 
-                    # Abzugswert sollte nicht kleiner Grundlast sein, sonnst wird PV-Leistung zur Ladung der Batterie berechnet,
-                    # BAUST die durch die Grundlast im Haus verbraucht wird. => Batterie wird nicht voll
+                    # Prognoseberechnung mit Funktion getRestTagesPrognoseUeberschuss
                     PrognoseUNDUeberschuss = getRestTagesPrognoseUeberschuss()
                     TagesPrognoseUeberschuss = PrognoseUNDUeberschuss[0]
                     TagesPrognoseGesamt = PrognoseUNDUeberschuss[1]
