@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import configparser
 import json
+import threading
 import time
 
 EV_Reservierung = '/home/GEN24/html/EV_Reservierung.json'
@@ -18,8 +19,7 @@ message_received = False
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        print("Verbunden mit MQTT Broker: ", broker_address)
-        client.subscribe(userdata['topic'])
+        print("Verbunden mit MQTT Broker: ",broker_address)
     else:
         print("Verbindung fehlgeschlagen, Fehlercode =", rc)
 
@@ -27,10 +27,13 @@ def on_publish(client, userdata, mid):
     print("Nachricht erfolgreich veröffentlicht.")
 
 def on_message(client, userdata, msg):
-    global message_received
-    print("Nachricht empfangen: ", msg.topic, ": ", msg.payload.decode(), "\n")
+    print("Nachricht empfangen: ", msg.topic, ": ",msg.payload.decode(),"\n")
+    #print("Wert:", msg.payload.decode())
+
+    # Hier könntest du die Nachricht speichern oder zurückgeben, je nach Bedarf
     userdata['message'] = msg.payload.decode()
-    message_received = True
+
+    # Verbindung trennen
     client.disconnect()
 
 def publish_message(topic, payload):
@@ -43,30 +46,16 @@ def publish_message(topic, payload):
     client.disconnect()
 
 def subscribe_to_topic(topic):
-    global message_received
-    message_received = False
-    userdata = {'message': None, 'topic': topic}
+    userdata = {'message': None}  # Initialisiere einen leeren 'message'-Schlüssel in userdata
     client = mqtt.Client(userdata=userdata)
     client.on_connect = on_connect
     client.on_message = on_message
 
     client.connect(broker_address, broker_port)
-    client.loop_start()
-
-    timeout = 5  # Sekunden
-    start_time = time.time()
-
-    while not message_received and (time.time() - start_time) < timeout:
-        time.sleep(0.1)
-
-    client.loop_stop()
-
-    if not message_received:
-        print()
-        print(f"Fehler: Keine Nachricht auf dem Topic {topic} innerhalb von {timeout} Sekunden empfangen.")
-        return None
-
-    return userdata['message']
+    client.subscribe(topic)
+    client.loop_forever()  # Wartet auf eingehende Nachrichten und ruft die Callback-Funktion on_message auf
+    
+    return userdata['message']  # Gibt die empfangene Nachricht zurück
 
 # Funktion zum Laden der JSON-Datei EV_Reservierung
 def lade_json(datei):
@@ -78,6 +67,7 @@ def lade_json(datei):
 def speichere_json(daten, datei):
     with open(datei, 'w') as f:
         json.dump(daten, f, indent=4)
+
 
 def lesen():
     Entladerate = subscribe_to_topic(maintopic + "/Entladerate")
@@ -107,17 +97,13 @@ def lesen():
         print("Fehler beim Schreiben in EV_Reservierung.")
 
     # Akku_Entladesteuerfile
-    try:
-        Entladerate = int(Entladerate)
-        if 0 <= Entladerate <= 100:
-            step = 20
-            for i in range(0, 101, step):
-                if i <= Entladerate < i + step:
-                    daten3['ManuelleEntladesteuerung']['Res_Feld1'] = i
-                    speichere_json(daten3, Entladesteuerfile)
-                    break
-        else:
-            print("Fehler beim Schreiben in Entladesteuerfile.")
-    except ValueError:
-        print("Fehler beim Konvertieren der Entladerate.")
-
+    Entladerate = int(Entladerate)
+    if 0 <= Entladerate <= 100:
+        step = 20
+        for i in range(0, 101, step):
+            if i <= Entladerate < i + step:
+                daten3['ManuelleEntladesteuerung']['Res_Feld1'] = i
+                speichere_json(daten3, Entladesteuerfile)
+                break
+    else:
+        print("Fehler beim Schreiben in Entladesteuerfile.")

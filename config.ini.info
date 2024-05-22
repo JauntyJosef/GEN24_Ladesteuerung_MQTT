@@ -6,7 +6,7 @@
 ; Parameter für die Batterieladesteuerung
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; QTT
+; MQTT
 ; Beim Speichern in der Weboberfläche auf der Seite "LadeStrg" bzw "ENTLadeStrg":
 ; Die Batterieladerate "Auto", "Aus", "Halb" oder "Voll" wird an das Topic "maintopic/Ladesteuerung" per MQTT gesendet.
 ; Die "Feste Entladerate" wird an das Topic "maintoptic/Entladerate" gesendet.
@@ -16,10 +16,12 @@
 [MQTT]
 ; 0 = MQTT senden/empfangen aus, 1 = MQTT senden/empfangen ein
 mqtt = 1
-broker_address = 10.0.0.160
+broker_address = 192.168.0.100
 broker_port = 1883
 ; Das Haupttopic ohne / am Ende einegeben.
 maintopic = Batteriesteuerung
+; Das Topic dafür, ob die Steuerung berücksichtigt werden soll. Dies kann dann nur Werte "on" oder "off" haben.
+control_topic = Steuerung
 
 
 ; Name der Datei mit den Wetterprognosewerten

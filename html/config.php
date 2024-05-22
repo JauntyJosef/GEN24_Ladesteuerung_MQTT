@@ -2,6 +2,7 @@
 // Hier die ../config.ini aus dem Pythonverzeichnis lesen
 $python_config = parse_ini_file("../config.ini", true);
 // Hier die Variablen für die PV-Reservierung definieren
+$SteuerungsFile = "../Steuerung.json";
 $PrognoseFile = "../weatherData.json";
 $ReservierungsFile = "EV_Reservierung.json";
 $WattReservierungsFile = "../Watt_Reservierung.json";

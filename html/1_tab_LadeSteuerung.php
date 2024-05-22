@@ -128,6 +128,8 @@
 input[type="radio"]{
   display: none;
 }
+#on:checked:checked ~ .on,
+#off:checked:checked ~ .off,
 #auto:checked:checked ~ .auto,
 #aus:checked:checked ~ .aus,
 #halb:checked:checked ~ .halb,
@@ -135,12 +137,16 @@ input[type="radio"]{
   border-color: #44c767;
   background: #44c767;
 }
+#on:checked:checked ~ .on .dot,
+#off:checked:checked ~ .off .dot,
 #auto:checked:checked ~ .auto .dot,
 #aus:checked:checked ~ .aus .dot,
 #halb:checked:checked ~ .halb .dot,
 #voll:checked:checked ~ .voll .dot{
   background: #000;
 }
+#on:checked:checked ~ .on .dot::before,
+#off:checked:checked ~ .off .dot::before,
 #auto:checked:checked ~ .auto .dot::before,
 #aus:checked:checked ~ .aus .dot::before,
 #halb:checked:checked ~ .halb .dot::before,
@@ -158,6 +164,8 @@ input[type="radio"]{
   font-size:150%;
   color: #000000;
 }
+#on:checked:checked ~ .on span,
+#off:checked:checked ~ .off span,
 #auto:checked:checked ~ .auto span,
 #aus:checked:checked ~ .aus span,
 #halb:checked:checked ~ .halb span,
@@ -171,11 +179,12 @@ input[type="radio"]{
  <body>
   <div class="container">
    <br />
-  <div align="center"><button type="button" id="import_data" class="speichern">PV Ladeplanung ==&#62;&#62; speichern</button></div>
+   <div align="center"><button type="button" id="import_data" class="speichern">Änderungen speichern</button></div>
    <br />
 
 <?php
 include "config.php";
+$Steuerung = json_decode(file_get_contents($SteuerungsFile),true);
 $Prognose = json_decode(file_get_contents($PrognoseFile), true);
 $EV_Reservierung = json_decode(file_get_contents($ReservierungsFile), true);
 
@@ -187,15 +196,45 @@ $ManuelleSteuerung_check = array(
     "voll" => ""
 );
 
+$Steuerung_check = array(
+  "on" => "",
+  "off" => ""
+);
+
 if (isset($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'])) {
-if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0) $ManuelleSteuerung_check['auto'] = 'checked';
-if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0.000001) $ManuelleSteuerung_check['aus'] = 'checked';
-if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0.0005) $ManuelleSteuerung_check['halb'] = 'checked';
-if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0.001) $ManuelleSteuerung_check['voll'] = 'checked';
-} else {
+  if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0) $ManuelleSteuerung_check['auto'] = 'checked';
+  if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0.000001) $ManuelleSteuerung_check['aus'] = 'checked';
+  if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0.0005) $ManuelleSteuerung_check['halb'] = 'checked';
+  if ($EV_Reservierung['ManuelleSteuerung']['Res_Feld1'] == 0.001) $ManuelleSteuerung_check['voll'] = 'checked';
+  } else {
 $ManuelleSteuerung_check['auto'] = 'checked';
 }
+
+if (isset($Steuerung['Steuerung'])) {
+  if ($Steuerung['Steuerung'] == 1) $Steuerung_check['on'] = 'checked';
+  if ($Steuerung['Steuerung'] == 0) $Steuerung_check['off'] = 'checked';
+  }
+
 ?>
+
+ <center>
+<div class="wrapper">
+<div class="beschriftung" title='Steuerung ein- bzw ausschalten.'>
+<nobr>Steuerung</nobr>
+</div>
+ <input type="radio" name="steuerung" id="on" value="1" <?php echo $Steuerung_check['on'] ?>>
+ <input type="radio" name="steuerung" id="off" value="0" <?php echo $Steuerung_check['off'] ?>>
+ <label for="on" class="option on">
+     <div class="dot"></div>
+      <span>&nbsp;Ein</span>
+   </label>
+   <label for="off" class="option off">
+     <div class="dot"></div>
+      <span>&nbsp;Aus</span>
+   </label>
+</div>
+</center>
+<br />
 
 <center>
 <div class="wrapper">
@@ -324,7 +363,7 @@ echo "</tbody></table>\n";
 ?>
    <br />
   </div>
-  <div align="center"><button type="button" id="import_data" class="speichern">PV Ladeplanung ==&#62;&#62; speichern</button></div>
+  <div align="center"><button type="button" id="import_data" class="speichern">Änderungen speichern</button></div>
 
 <?php echo "</br>Prognose von $Prognose[messageCreated]"; ?> 
 <script>
@@ -357,10 +396,19 @@ $(document).ready(function(){
   //alert (Tag_Zeit + "\n" + Res_Feld1 + "\n" + Res_Feld2);
   }
 
+  let steuerung_value = '';
+  const steuerung = document.querySelectorAll('input[name="steuerung"]');
+  for(var i=0; i < steuerung.length; i++){
+    if(steuerung[i].checked == true){
+        steuerung_value = steuerung[i].value;
+    }
+  }
+
+
   $.ajax({
    url:"speichern.php",
    method:"post",
-   data:{Tag_Zeit:Tag_Zeit, Res_Feld1:Res_Feld1, Res_Feld2:Res_Feld2},
+   data:{Tag_Zeit:Tag_Zeit, Res_Feld1:Res_Feld1, Res_Feld2:Res_Feld2, steuerung:steuerung_value},
    success:function(data)
    {
     location.reload();

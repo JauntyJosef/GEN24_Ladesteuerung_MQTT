@@ -6,6 +6,7 @@ $EV = array();
 $Tag_Zeit = $_POST["Tag_Zeit"];
 $Feld1 = $_POST['Res_Feld1'];
 $Feld2 = $_POST['Res_Feld2'];
+$steuerung_value = isset($_POST['steuerung']) ? $_POST['steuerung'] : null;
 
 if(isset($_POST["Tag_Zeit"]))
 {
@@ -22,6 +23,16 @@ file_put_contents($WattReservierungsFile, json_encode($Watt, JSON_PRETTY_PRINT))
 
 // Laden und Decodieren des JSON-Dokuments in ein Array
 $AV = json_decode(file_get_contents($ReservierungsFile), true);
+
+//Steuerungsfile schreiben
+if($steuerung_value !== null) {
+    $steuerung_data = ['Steuerung' => $steuerung_value];
+    file_put_contents($SteuerungsFile, json_encode($steuerung_data, JSON_PRETTY_PRINT));
+}
+//Steuerung MQTT senden
+$pythonSkript = '/home/GEN24/Steuerung_mqtt_senden.py';
+    $command = 'python3 ' . $pythonSkript . ' ' . escapeshellarg($steuerung_value);
+    exec($command);
 
 // Überprüfen, ob "ManuelleSteuerung" im Array vorhanden ist
 if(isset($AV["ManuelleSteuerung"])) {

@@ -3,6 +3,7 @@ import pytz
 import requests
 import SymoGen24Connector
 import mqtt_functions
+import sys
 from ping3 import ping
 from sys import argv
 from functions import loadConfig, loadWeatherData, loadPVReservierung, getVarConf, save_SQLite
@@ -244,15 +245,85 @@ if __name__ == '__main__':
             print("Fehlermeldung:", e)
             print()
 
+        print("################# M Q T T #################")
         if  mqtt_status == 1:
-            try:        
-                print("\n######### MQTT empfangen und in JSON schreiben #########\n") 
-                mqtt_functions.lesen()
+            print("MQTT ist aktiviert.")
+            # Prüfen, ob Skript ausgeführt werden soll
+            try:
+                print("\n# Prüfe ob Steuerung aktiviert werden soll:\n")
+                maintopic = config.get('MQTT', 'maintopic')
+                control_topic = config.get('MQTT', 'control_topic')
+                steuerung = mqtt_functions.subscribe_to_topic(maintopic + "/" + control_topic)
+                if steuerung == None:
+                    print("An- und ausschalten der Steuerung per MQTT nicht möglich. Entsprechendes Topic ist nicht vorhanden.")
+                elif steuerung == "1":
+                    print("Die automatische Steuerung ist an ... Programm wird fortgesetzt")
+                elif steuerung == "0":
+                    print("Die automatische Steuerung ist aus ... Programm wird beendet.")
+                    print()
+                    print("************* ENDE: ", datetime.now(),"************* \n")   
+                    sys.exit(0)
+                else:
+                    print("Kein gültiger Wert empfangen. Programm wird fortgesetzt.")
             except Exception as e:
-                print()
-                print("Fehler in den Printbefehlen, Ausgabe nicht möglich!")
+                print("!!!! ACHTUNG FEHLER !!!! Bitte Fehlermeldung beachten!")
                 print("Fehlermeldung:", e)
                 print()
+                steurungsdata = loadPVReservierung("./Steuerung.json")
+                # Manuellen Entladewert lesen
+                steuerung = steurungsdata.get('Steuerung')
+                try:
+                    print("\n# Prüfe ob Steuerung aktiviert werden soll:\n")
+                    if steuerung == None:
+                        print("Keine Daten vorhanden.")
+                    elif steuerung == "1":
+                        print("Die automatische Steuerung ist an ... Programm wird fortgesetzt")
+                    elif steuerung == "0":
+                        print("Die automatische Steuerung ist aus ... Programm wird beendet.")
+                        print()
+                        print("************* ENDE: ", datetime.now(),"************* \n")   
+                        sys.exit(0)
+                    else:
+                        print("Kein gültiger Wert empfangen. Programm wird fortgesetzt.")
+                except Exception as e:
+                    print("!!!! ACHTUNG FEHLER !!!! Bitte Fehlermeldung beachten!")
+                    print("Fehlermeldung:", e)
+                    print()
+
+            # Lade- Entladerate über MQTT holen
+            try:        
+                print("\n# Lade- und Entladerate empfangen und in JSON schreiben\n") 
+                mqtt_functions.lesen()
+            except Exception as e:
+                print("!!!! ACHTUNG FEHLER !!!! Bitte Fehlermeldung beachten!")
+                print("Fehlermeldung:", e)
+                print()
+
+        if  mqtt_status == 0:
+            print("MQTT ist deakiviert.")
+            # Steuerungsfile lesen
+            #SteuerungFile = getVarConf('Entladung','Akku_EntladeSteuerungsFile','str')
+            steurungsdata = loadPVReservierung("./Steuerung.json")
+            # Manuellen Entladewert lesen
+            steuerung = steurungsdata.get('Steuerung')
+            try:
+                print("\n# Prüfe ob Steuerung aktiviert werden soll:\n")
+                if steuerung == None:
+                    print("Keine Daten vorhanden.")
+                elif steuerung == "1":
+                    print("Die automatische Steuerung ist an ... Programm wird fortgesetzt")
+                elif steuerung == "0":
+                    print("Die automatische Steuerung ist aus ... Programm wird beendet.")
+                    print()
+                    print("************* ENDE: ", datetime.now(),"************* \n")   
+                    sys.exit(0)
+                else:
+                    print("Kein gültiger Wert empfangen. Programm wird fortgesetzt.")
+            except Exception as e:
+                print("!!!! ACHTUNG FEHLER !!!! Bitte Fehlermeldung beachten!")
+                print("Fehlermeldung:", e)
+                print()
+
 
         if ping(host_ip):
             # Nur ausführen, wenn WR erreichbar
