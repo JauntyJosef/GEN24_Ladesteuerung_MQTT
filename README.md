@@ -1,6 +1,7 @@
 ## Unterschied zum Original ##
-Eine einfache implimentierung von MQTT. Man kann über MQTT die selben Werte einstellen, wie es auch auf der Weboberfläche möglich ist (siehe config.ini.info).
-Es ist möglich, das komplette Skript über die Weboberfläche und MQTT zu deaktivieren. Die Einstellungen am Wechselrichter bleiben auf den Letztgewählten.
+Eine einfache implimentierung von MQTT. Man kann über MQTT die selben Werte Lade- bzw Entladewerte einstellen, wie es auch auf der Weboberfläche möglich ist (siehe config.ini.info). Nachrichten müssen als "Retained" gesendet werden, da diese sonst nicht beim Programmdurchlauf abgeholt werden können.
+Es ist möglich, das komplette Skript über die Weboberfläche und per MQTT zu deaktivieren.
+Die Einstellungen am Wechselrichter bleiben auf den Letztgewählten.
 
 ## ☀️ GEN24_Ladesteuerung mit MQTT🔋
 Im Unterschied zum Original, gibt es eine rudimentäre Implimentierung einer MQTT Funktion. Eine Erklärung ist in der config.ini.info zu lesen.

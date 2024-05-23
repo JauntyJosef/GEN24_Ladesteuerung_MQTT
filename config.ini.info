@@ -14,13 +14,14 @@
 ; bzw Akku_EntLadeSteuerFile.json geschrieben.
 ; Wichtig ist, dass sich alles im Ordner /home/GEN24 befindet.
 [MQTT]
+; Nachrichcten müssen als "Retained" gesendet werden, sonst können diese nicht abgeholt werden.
 ; 0 = MQTT senden/empfangen aus, 1 = MQTT senden/empfangen ein
 mqtt = 1
 broker_address = 192.168.0.100
 broker_port = 1883
 ; Das Haupttopic ohne / am Ende einegeben.
 maintopic = Batteriesteuerung
-; Das Topic dafür, ob die Steuerung berücksichtigt werden soll. Dies kann dann nur Werte "on" oder "off" haben.
+; Das Topic dafür, ob das Programm überhaupt durchlaufen wird. Dies kann dann nur Werte "on=1" oder "off=0" haben.
 control_topic = Steuerung
 
 

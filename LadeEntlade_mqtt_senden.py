@@ -8,7 +8,7 @@ config.read('/home/GEN24/config.ini')
 maintopic = config.get('MQTT', 'maintopic')
 MQTT = config.get('MQTT', 'mqtt')
 
-if MQTT == 1:
+if MQTT == "1":
     if len(sys.argv) != 2:
         print("Bitte geben Sie genau ein Argument an.")
         sys.exit(1)
