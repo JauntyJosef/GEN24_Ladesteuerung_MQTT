@@ -1,9 +1,19 @@
-**[0.14.0] – 2024-XX-XX**
+**[0.14.1] – 2024-XX-XX**
+
+#### ACHTUNG Änderung in der config.ini:
+- neue Variable 'GrenzwertGroestePrognose'
+
+Da bei niedrigen Prognosen oft die Ladesteuerung ein bisschen untersteuert,
+wird nun mit MaxLadung geladen, wenn die größte Prognose unter dem Wert
+in 'GrenzwertGroestePrognose' liegt.
+
+
+**[0.14.0] – 2024-05-25**
 
 **NEU Konzeptionierung der Ladewertberechnung nach Prognose:**
 Umfangreiche Änderung in SymoGen24Controller2.py
 - genauere Berechnung der Ladedewerte aus den Prognosen.
-  Vermeidung von Sprüngen in der Prognosenberechnung
+- Vermeidung von Sprüngen in der Prognosenberechnung
 
 Ladewerte_Vergleichtabelle.ods entfernt, da nicht mehr aktuell und nötig
 
